@@ -354,7 +354,7 @@
             resultDiv.innerHTML = '<span style="color: blue;">Submitting...</span>';
             
             try {
-                const response = await fetch('/api/submit', {
+                const response = await fetch('http://116.203.210.21:5000/api/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
