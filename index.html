@@ -20,6 +20,7 @@
                     <li><a href="#about">About</a></li>
                     <li><a href="#skills">Skills</a></li>
                     <li><a href="#projects">Projects</a></li>
+                    <li><a href="#features">Features</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
                 <div class="menu-icon">
@@ -155,6 +156,68 @@
         </div>
     </section>
 
+    <!-- Features Section -->
+    <section id="features">
+        <div class="container">
+            <h2 class="section-title">Interactive Features</h2>
+            <div class="features-grid">
+                <!-- Local Storage Feature -->
+                <div class="feature-card">
+                    <h3>Local Storage Demo</h3>
+                    <p>Save and retrieve your preferences locally in your browser.</p>
+                    <div class="storage-demo">
+                        <input type="text" id="storageInput" placeholder="Enter some text">
+                        <div class="button-group">
+                            <button onclick="saveToStorage()" class="feature-btn">Save</button>
+                            <button onclick="loadFromStorage()" class="feature-btn">Load</button>
+                            <button onclick="clearStorage()" class="feature-btn">Clear</button>
+                        </div>
+                        <div id="storageResult" class="result-display"></div>
+                    </div>
+                </div>
+
+                <!-- Mouse Events Feature -->
+                <div class="feature-card">
+                    <h3>Mouse Events Demo</h3>
+                    <p>Interactive elements with different mouse events.</p>
+                    <div class="mouse-demo">
+                        <div id="mouseBox" class="interactive-box" 
+                             onmouseenter="handleMouseEnter()" 
+                             onmouseleave="handleMouseLeave()" 
+                             onclick="handleClick()"
+                             title="This is a tooltip! Hover, click, or leave to see different effects.">
+                            <span id="mouseText">Hover over me!</span>
+                        </div>
+                        <div id="mouseResult" class="result-display"></div>
+                    </div>
+                </div>
+
+                <!-- Database Form Feature -->
+                <div class="feature-card">
+                    <h3>Contact Form</h3>
+                    <p>Submit your message to our database.</p>
+                    <form id="databaseForm" class="database-form">
+                        <div class="form-group">
+                            <label for="userName">Name:</label>
+                            <input type="text" id="userName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail">Email:</label>
+                            <input type="email" id="userEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userMessage">Message:</label>
+                            <textarea id="userMessage" name="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="feature-btn">Submit to Database</button>
+                    </form>
+                    <div id="formResult" class="result-display"></div>
+                    <a href="/data" target="_blank" class="view-data-link">View Saved Data</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact">
         <div class="container">
@@ -205,5 +268,120 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // Local Storage Functions
+        function saveToStorage() {
+            const input = document.getElementById('storageInput');
+            const value = input.value.trim();
+            
+            if (value === '') {
+                document.getElementById('storageResult').innerHTML = '<span style="color: red;">Please enter some text first!</span>';
+                return;
+            }
+            
+            localStorage.setItem('userText', value);
+            document.getElementById('storageResult').innerHTML = '<span style="color: green;">Text saved to local storage!</span>';
+        }
+
+        function loadFromStorage() {
+            const storedValue = localStorage.getItem('userText');
+            const resultDiv = document.getElementById('storageResult');
+            
+            if (storedValue) {
+                document.getElementById('storageInput').value = storedValue;
+                resultDiv.innerHTML = '<span style="color: blue;">Text loaded from storage: "' + storedValue + '"</span>';
+            } else {
+                resultDiv.innerHTML = '<span style="color: orange;">No data found in storage!</span>';
+            }
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('userText');
+            document.getElementById('storageInput').value = '';
+            document.getElementById('storageResult').innerHTML = '<span style="color: gray;">Storage cleared!</span>';
+        }
+
+        // Mouse Event Functions
+        function handleMouseEnter() {
+            const box = document.getElementById('mouseBox');
+            const text = document.getElementById('mouseText');
+            const result = document.getElementById('mouseResult');
+            
+            box.style.backgroundColor = '#FF69B4';
+            box.style.transform = 'scale(1.1)';
+            text.textContent = 'Mouse entered!';
+            result.innerHTML = '<span style="color: #FF1493;">Mouse Enter Event Triggered!</span>';
+        }
+
+        function handleMouseLeave() {
+            const box = document.getElementById('mouseBox');
+            const text = document.getElementById('mouseText');
+            const result = document.getElementById('mouseResult');
+            
+            box.style.backgroundColor = '#f4f4f4';
+            box.style.transform = 'scale(1)';
+            text.textContent = 'Mouse left!';
+            result.innerHTML = '<span style="color: #666;">Mouse Leave Event Triggered!</span>';
+        }
+
+        function handleClick() {
+            const box = document.getElementById('mouseBox');
+            const text = document.getElementById('mouseText');
+            const result = document.getElementById('mouseResult');
+            
+            box.style.backgroundColor = '#FF1493';
+            box.style.transform = 'rotate(5deg) scale(1.05)';
+            text.textContent = 'Clicked!';
+            result.innerHTML = '<span style="color: #C71585;">Click Event Triggered!</span>';
+            
+            setTimeout(() => {
+                box.style.transform = 'rotate(0deg) scale(1)';
+            }, 200);
+        }
+
+        // Database Form Submission
+        document.getElementById('databaseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                message: document.getElementById('userMessage').value
+            };
+            
+            const resultDiv = document.getElementById('formResult');
+            resultDiv.innerHTML = '<span style="color: blue;">Submitting...</span>';
+            
+            try {
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    resultDiv.innerHTML = '<span style="color: green;">Message saved successfully! ID: ' + result.id + '</span>';
+                    document.getElementById('databaseForm').reset();
+                } else {
+                    resultDiv.innerHTML = '<span style="color: red;">Error saving message. Please try again.</span>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<span style="color: red;">Network error. Make sure the server is running.</span>';
+            }
+        });
+
+        // Load saved data on page load
+        window.addEventListener('load', function() {
+            // Auto-load from storage if available
+            const storedValue = localStorage.getItem('userText');
+            if (storedValue) {
+                document.getElementById('storageInput').value = storedValue;
+            }
+        });
+    </script>
 </body>
 </html>
